@@ -1,10 +1,8 @@
-import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { Response } from 'express';
+import { prisma } from '../lib/prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
 
-
-const prisma = new PrismaClient();
 
 // GET /users/profile - Get user profile
 export const getProfile = async (req: AuthRequest, res: Response) => {
