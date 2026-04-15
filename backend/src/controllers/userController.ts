@@ -1,7 +1,8 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { AuthRequest } from '../middleware/authMiddleware';
+import { AuthRequest } from '../middleware/auth.middleware';
+
 
 const prisma = new PrismaClient();
 
