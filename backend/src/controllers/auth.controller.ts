@@ -1,115 +1,84 @@
-import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { prisma } from "../lib/prisma";
-import { generateReferralCode } from "../utils/referral";
+import { Request, Response } from 'express';
+import { AuthService } from '../services/auth.service';
+import { RegisterDTO } from '../dtos/auth/register.dto';
+import { LoginDTO } from '../dtos/auth/login.dto';
+import { ERROR_MESSAGES, HTTP_STATUS, SUCCESS_MESSAGES } from '../constants/constants';
+import { z } from 'zod';
+
+const authService = new AuthService();
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, fullName, role } = req.body;
+    const validatedData = RegisterDTO.parse(req.body);
+    const { token, user } = await authService.register(validatedData);
 
-    if (!email || !password || !fullName || !role) {
-      return res.status(400).json({
-        success: false,
-        message: "Email, password, fullName, and role are required",
-      });
-    }
-
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Email already exists",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    let referralCode = generateReferralCode(fullName);
-
-    while (await prisma.user.findUnique({ where: { referralCode } })) {
-      referralCode = generateReferralCode(fullName);
-    }
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash: hashedPassword,
-        role,
-        referralCode,
-        profile: {
-          create: {
-            fullName,
-          },
-        },
-      },
-      include: {
-        profile: true,
-      },
-    });
-
-    return res.status(201).json({
+    res.status(HTTP_STATUS.CREATED).json({
       success: true,
-      message: "Register success",
-      data: user,
+      message: SUCCESS_MESSAGES.REGISTER_SUCCESS,
+      data: {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          referralCode: user.referralCode,
+          points: user.points,
+          createdAt: user.createdAt,
+          profile: user.profile
+        }
+      }
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    if (error instanceof z.ZodError) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        errors: error.issues.map((issue: z.ZodIssue) => issue.message)
+      });
+    }
+    
+    const message = error instanceof Error ? error.message : ERROR_MESSAGES.INTERNAL_ERROR;
+    const status = message === ERROR_MESSAGES.EMAIL_EXISTS 
+      ? HTTP_STATUS.BAD_REQUEST 
+      : HTTP_STATUS.INTERNAL_SERVER_ERROR;
+    
+    res.status(status).json({ success: false, error: message });
   }
 };
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const validatedData = LoginDTO.parse(req.body);
+    const { token, user } = await authService.login(validatedData);
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: { profile: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-
-    if (!isPasswordValid) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid password",
-      });
-    }
-
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: "1d" }
-    );
-
-    return res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       success: true,
-      message: "Login success",
-      data: { token, user },
+      message: SUCCESS_MESSAGES.LOGIN_SUCCESS,
+      data: {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          referralCode: user.referralCode,
+          points: user.points,
+          createdAt: user.createdAt,
+          profile: user.profile
+        }
+      }
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    if (error instanceof z.ZodError) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        errors: error.issues.map((issue: z.ZodIssue) => issue.message)
+      });
+    }
+    
+    const message = error instanceof Error ? error.message : ERROR_MESSAGES.INTERNAL_ERROR;
+    const status = message === ERROR_MESSAGES.INVALID_CREDENTIALS 
+      ? HTTP_STATUS.UNAUTHORIZED 
+      : HTTP_STATUS.INTERNAL_SERVER_ERROR;
+    
+    res.status(status).json({ success: false, error: message });
   }
 };
