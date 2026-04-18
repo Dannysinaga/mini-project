@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
+import { z } from "zod";
 import { prisma } from "../lib/prisma";
+import { CreateEventDTO } from "../dtos/event/create-event.dto";
 
 export const createEvent = async (req: Request, res: Response) => {
   try {
+    const validatedData = CreateEventDTO.parse(req.body);
+
     const {
       organizerId,
       name,
@@ -13,22 +17,7 @@ export const createEvent = async (req: Request, res: Response) => {
       endDate,
       bannerUrl,
       ticketTypes,
-    } = req.body;
-
-    if (
-      !organizerId ||
-      !name ||
-      !category ||
-      !location ||
-      !startDate ||
-      !endDate
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "organizerId, name, category, location, startDate, and endDate are required",
-      });
-    }
+    } = validatedData;
 
     const organizer = await prisma.user.findUnique({
       where: { id: organizerId },
@@ -72,7 +61,7 @@ export const createEvent = async (req: Request, res: Response) => {
         ticketTypes: {
           create:
             Array.isArray(ticketTypes) && ticketTypes.length > 0
-              ? ticketTypes.map((ticket: any) => ({
+              ? ticketTypes.map((ticket) => ({
                   name: ticket.name,
                   price: Number(ticket.price),
                   quota: Number(ticket.quota),
@@ -97,6 +86,13 @@ export const createEvent = async (req: Request, res: Response) => {
       data: event,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        errors: error.issues.map((issue) => issue.message),
+      });
+    }
+
     console.error("CREATE EVENT ERROR:", error);
 
     return res.status(500).json({
