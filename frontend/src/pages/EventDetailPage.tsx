@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getEventDetail } from "../services/event.service";
-import type { Event } from "../../types/event";
+import type { Event } from "../types/event";
 
 const EventDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,17 +31,9 @@ const EventDetailPage = () => {
     fetchEventDetail();
   }, [id]);
 
-  if (loading) {
-    return <p>Loading event detail...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  if (!event) {
-    return <p>Event not found</p>;
-  }
+  if (loading) return <p>Loading event detail...</p>;
+  if (error) return <p>{error}</p>;
+  if (!event) return <p>Event not found</p>;
 
   return (
     <div style={{ padding: "24px" }}>

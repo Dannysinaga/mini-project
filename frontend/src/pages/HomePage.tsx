@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import EventCard from "../components/Event.Card";
+import EventCard from "../components/EventCard";
 import { getEvents } from "../services/event.service";
-import type { Event } from "../../types/event";
+import type { Event } from "../types/event";
 
 const HomePage = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -24,17 +24,9 @@ const HomePage = () => {
     fetchEvents();
   }, []);
 
-  if (loading) {
-    return <p>Loading events...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  if (events.length === 0) {
-    return <p>No events available</p>;
-  }
+  if (loading) return <p>Loading events...</p>;
+  if (error) return <p>{error}</p>;
+  if (events.length === 0) return <p>No events available</p>;
 
   return (
     <div style={{ padding: "24px" }}>

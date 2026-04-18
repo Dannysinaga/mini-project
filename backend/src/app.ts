@@ -4,7 +4,7 @@ import authRoutes from "./routes/auth.routes";
 import eventRoutes from "./routes/event.routes";
 import transactionRoutes from "./routes/transaction.routes";
 
-const app = express();
+const app = express();    
 
 app.use(cors());
 app.use(express.json());

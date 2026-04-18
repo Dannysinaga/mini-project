@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HomePage from "./pages/Home.Page";
-import EventDetailPage from "./pages/Event.Detail.Page";
+import HomePage from "./pages/HomePage";
+import EventDetailPage from "./pages/EventDetailPage";
 
 function App() {
   return (

@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
-import type { Event } from "../../types/event";
+import type { Event } from "../types/event";
 
 interface EventCardProps {
   event: Event;
 }
 
 const EventCard = ({ event }: EventCardProps) => {
-  const imageUrl = event.bannerUrl || "https://via.placeholder.com/400x250?text=No+Image";
+  const imageUrl =
+    event.bannerUrl || "https://via.placeholder.com/400x250?text=No+Image";
 
   return (
     <div

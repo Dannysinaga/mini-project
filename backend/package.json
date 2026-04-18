@@ -18,6 +18,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
@@ -28,6 +29,7 @@
     "multer": "^2.1.1",
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.4",
+    "pg": "^8.20.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -38,6 +40,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
     "@types/node": "^25.5.2",
+    "@types/pg": "^8.20.0",
     "jest": "^30.3.0",
     "nodemon": "^3.1.14",
     "prisma": "^7.7.0",
