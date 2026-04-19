@@ -1,9 +1,15 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import EventDetailPage from "./pages/EventDetailPage";
+
 function App() {
   return (
-    <div className="p-8 text-center">
-      <h1 className="text-3xl font-bold underline">Frontend jalan</h1>
-      <p className="mt-4">Tailwind sudah aktif</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/events/:id" element={<EventDetailPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
