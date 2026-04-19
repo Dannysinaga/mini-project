@@ -102,11 +102,33 @@ export const createEvent = async (req: Request, res: Response) => {
   }
 };
 
-export const getEvents = async (_req: Request, res: Response) => {
+export const getEvents = async (req: Request, res: Response) => {
   try {
+    const search = (req.query.search as string | undefined)?.trim();
+    const category = (req.query.category as string | undefined)?.trim();
+    const location = (req.query.location as string | undefined)?.trim();
+
     const events = await prisma.event.findMany({
       where: {
         deletedAt: null,
+        ...(search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { description: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : {}),
+        ...(category
+          ? {
+              category: { contains: category, mode: "insensitive" },
+            }
+          : {}),
+        ...(location
+          ? {
+              location: { contains: location, mode: "insensitive" },
+            }
+          : {}),
       },
       include: {
         ticketTypes: true,

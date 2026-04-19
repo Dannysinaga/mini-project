@@ -9,12 +9,24 @@ interface ApiResponse<T> {
   data: T;
 }
 
-export const getEvents = async (): Promise<Event[]> => {
-  const response = await axios.get<ApiResponse<Event[]>>(`${API_URL}/events`);
+interface GetEventsParams {
+  search?: string;
+  category?: string;
+  location?: string;
+}
+
+export const getEvents = async (
+  params?: GetEventsParams
+): Promise<Event[]> => {
+  const response = await axios.get<ApiResponse<Event[]>>(`${API_URL}/events`, {
+    params,
+  });
   return response.data.data;
 };
 
 export const getEventDetail = async (id: string): Promise<Event> => {
-  const response = await axios.get<ApiResponse<Event>>(`${API_URL}/events/${id}`);
+  const response = await axios.get<ApiResponse<Event>>(
+    `${API_URL}/events/${id}`
+  );
   return response.data.data;
 };
