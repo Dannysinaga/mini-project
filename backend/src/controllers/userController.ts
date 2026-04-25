@@ -51,13 +51,13 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     const profile = await prisma.profile.upsert({
       where: { userId: userId! },
       update: {
-        fullname: fullname || undefined,
+        fullName: fullname || undefined,   // ← DIUBAH: fullname → fullName
         phone: phone || undefined,
         photoUrl: photoUrl || undefined
       },
       create: {
         userId: userId!,
-        fullname: fullname || null,
+        fullName: fullname || null,        // ← DIUBAH: fullname → fullName
         phone: phone || null,
         photoUrl: photoUrl || null
       }
