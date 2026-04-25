@@ -1,8 +1,7 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes";
-import eventRoutes from "./routes/event.routes";
-import transactionRoutes from "./routes/transaction.routes";
+
 import userRoutes from "./routes/user.routes";        
 import pointsRoutes from "./routes/points.routes";
 import dashboardRoutes from "./routes/dashboard.routes";    
@@ -20,8 +19,6 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/auth", authRoutes);
-app.use("/events", eventRoutes);
-app.use("/transactions", transactionRoutes);
 app.use("/users", userRoutes);                        
 app.use("/points", pointsRoutes);
 app.use("/dashboard", dashboardRoutes);                   
